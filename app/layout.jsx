@@ -5,7 +5,7 @@ import { Toaster } from '@node_modules/react-hot-toast/dist'
 
 export const metadata = {
     title: 'Project Management Tool',
-    description: 'Monitor Task'
+    description: 'Monitor Tasks'
 }
 
 const RootLayout = ({ children }) => {

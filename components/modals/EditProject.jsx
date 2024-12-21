@@ -1,17 +1,15 @@
 // components/Modal.js
-import { addProject } from "@hooks/project";
+import { addProject, editProject } from "@hooks/project";
 import { getCookie } from "cookies-next/client";
 import toast from "@node_modules/react-hot-toast/dist";
 import React, { useState } from "react";
 
-const AddProject = ({ isOpen, onClose , getAllProjects}) => {
+const EditProject = ({ isOpen, onClose, editData, getAllProjects }) => {
   if (!isOpen) return null;
-  const user = getCookie('user_id');
-  console.log("user: ", user)
+
   const [formData, setFormData] = useState({
-    userid: user,
-    name: "",
-    description: "",
+    name: editData.name,
+    description: editData.description,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,11 +18,6 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.userid) {
-      newErrors.userid = "User ID is required";
-    } else if (formData.userid.length < 3) {
-      newErrors.userid = "User ID must be at least 3 characters";
-    }
 
     if (!formData.name) {
       newErrors.name = "Name is required";
@@ -65,13 +58,14 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
       return;
     }
 
-    const response = await addProject(formData);
-    if(response != null){
+
+    const response = await editProject(formData, editData.id);
+    if(response){
       onClose()
-      toast.success("Project Added Successfully")
+      toast.success("Project Edited Successfully")
       getAllProjects();
     }else{
-      toast.error("No Member Found")
+      toast.error("Edit Unsuccessful")
     }
 
     setIsSubmitting(false);
@@ -81,33 +75,10 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="orange_gradient text-xl font-semibold mb-4">
-          <b>Add Project</b>
+          <b>Edit Project</b>
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label
-              htmlFor="userid"
-              className="block text-sm font-medium text-gray-700"
-            >
-              User ID
-            </label>
-            <input
-            
-              id="userid"
-              name="userid"
-              type="text"
-              placeholder="Enter your userid"
-              value={formData.userid}
-              onChange={handleChange}
-              disabled={true}
-              className={`w-full px-4 py-2 bg-gray-200 cursor-not-allowed border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.userid ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {errors.userid && (
-              <p className="text-sm text-red-500">{errors.userid}</p>
-            )}
-          </div>
+          
 
           <div className="space-y-2">
             <label
@@ -162,7 +133,7 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
             disabled={isSubmitting}
             className=" w-full px-4 py-2 text-white bg-[#F3940B] rounded-lg hover:bg-[#EE750B] focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Adding..." : "Add"}
+            {isSubmitting ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
@@ -177,4 +148,4 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
   );
 };
 
-export default AddProject;
+export default EditProject;

@@ -1,3 +1,4 @@
+import Image from "@node_modules/next/image";
 import React from "react";
 
 const HeaderTitle = () => {
@@ -6,10 +7,10 @@ const HeaderTitle = () => {
       <h1 className=" head_text text-center">
         Project Management Tool
         <br className=" max-md:hidden" />
-        <span className="orange_gradient text-center">
-          Project & Tasks Tracker
-        </span>
       </h1>
+      <p className="orange_gradient text-center text-4xl font-bold mt-2">
+        Project & Tasks Tracker
+      </p>
     </div>
   );
 };

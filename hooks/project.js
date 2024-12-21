@@ -1,4 +1,4 @@
-import { getData, postData } from "@utils/api/api";
+import { getData, patchData, postData } from "@utils/api/api";
 
 const url = process.env.NEXT_PUBLIC_DOWINN_API_URL;
 
@@ -21,8 +21,26 @@ export async function addProject(formData) {
     console.error(error.message);
   }
 }
+export async function editProject(formData, id) {
+  try {
+    const data = {
+      id: id,
+      name: formData.name,
+      description: formData.description,
+    };
 
-export async function getAllProject() {
+    console.log(data)
+
+    const response = await patchData(`${url}/test02/patch_project`, data);
+
+    return {valid: true}
+    
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+export async function getAllProjectData() {
   try {
     const response = await getData(`${url}/test02/get_all_project`);
 

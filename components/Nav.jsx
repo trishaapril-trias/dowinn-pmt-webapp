@@ -3,13 +3,20 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { getLoggedIn, logout } from "@context/auth";
+import { useAuth } from "@hooks/useAuth";
+import { redirect } from "@node_modules/next/navigation";
+
 // import { signIn, signOut, useSession, getProviders } from "@node_modules/next-auth/react";
 
 
 
 const Nav = () => {
-  const isUserLoggedIn = false;
+  // const isUserLoggedIn = false;
+   const isUserLoggedIn =  useAuth()
   const [toggleDropdown, setToggleDropdown] = useState(false);
+
+  
 
   useEffect(() => {
     
@@ -19,14 +26,17 @@ const Nav = () => {
     <nav className="flex-between w-full mb-16 pt-3">
       <Link href="/login" className="flex gap-2 flex-center py-5">
         <Image
-          src="/assets/images/logo.svg"
+          src="/assets/images/logo_pmt.png"
           alt="PMT Logo"
-          width={30}
-          height={30}
+          width={40}
+          height={40}
           className="object-contain"
         />
-        <p className="text-primary-orange font-semibold ">Project Management WebApp</p>
+        <p className="orange_gradient font-semibold ">Project Management WebApp</p>
       </Link>
+      <button type="button" className="black_btn" onClick={async() =>{ await logout(); redirect("/")}}>
+        Logout
+      </button>
 
       {/* Desktop Navigation*/}
       {/* <div className=" sm:flex hidden">

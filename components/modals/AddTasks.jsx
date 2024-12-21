@@ -1,7 +1,10 @@
 // components/Modal.js
+import { addTasks } from "@hooks/tasks";
+import { useParams } from "@node_modules/next/navigation";
+import toast from "@node_modules/react-hot-toast/dist";
 import React, { useState } from "react";
 
-const AddTask = ({ isOpen, onClose }) => {
+const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
   if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
@@ -16,7 +19,6 @@ const AddTask = ({ isOpen, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
 
-
     if (!formData.name) {
       newErrors.name = "Name is required";
     } else if (formData.name.length < 3) {
@@ -24,10 +26,10 @@ const AddTask = ({ isOpen, onClose }) => {
     }
 
     if (!formData.status) {
-        newErrors.status = "Status is required";
-      } else if (formData.status.length < 3) {
-        newErrors.status = "Status must be at least 3 characters";
-      }
+      newErrors.status = "Status is required";
+    } else if (formData.status.length < 3) {
+      newErrors.status = "Status must be at least 3 characters";
+    }
 
     if (!formData.contents) {
       newErrors.contents = "Contents is required";
@@ -54,6 +56,7 @@ const AddTask = ({ isOpen, onClose }) => {
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError("");
@@ -62,9 +65,16 @@ const AddTask = ({ isOpen, onClose }) => {
       return;
     }
 
-    setIsSubmitting(false);
+    const response = await addTasks(formData, projectID);
+    if (response != null) {
+      onClose();
+      getAllTasks();
+      toast.success("Task Added Successfully");
+    } else {
+      toast.error("No Project Found");
+    }
 
-    console.log("form: ", formData);
+    setIsSubmitting(false);
   };
 
   return (
@@ -74,7 +84,6 @@ const AddTask = ({ isOpen, onClose }) => {
           <b>Add Task</b>
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           <div className="space-y-2">
             <label
               htmlFor="name"
@@ -85,7 +94,7 @@ const AddTask = ({ isOpen, onClose }) => {
             <input
               id="name"
               name="name"
-              type="password"
+              type="text"
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
@@ -106,18 +115,23 @@ const AddTask = ({ isOpen, onClose }) => {
             >
               Status
             </label>
-            <input
+            <select
               id="status"
               name="status"
-              type="text"
-              placeholder="Enter your status"
               value={formData.status}
               onChange={handleChange}
               disabled={isSubmitting}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.status ? "border-red-500" : "border-gray-300"
               }`}
-            />
+            >
+              <option value="" disabled>
+                Please Select...
+              </option>
+              <option value="Todo">Todo</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
             {errors.status && (
               <p className="text-sm text-red-500">{errors.status}</p>
             )}
