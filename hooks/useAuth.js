@@ -1,46 +1,36 @@
-
-'use client'
-import { useState, useEffect } from 'react'
+'use client';
+import { hasCookie } from '@node_modules/cookies-next/lib';
+import { useState, useEffect } from 'react';
 
 export function useAuth() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        setIsLoading(true)
-        console.log('Fetching auth status...')  // Debug log
-        
-        const response = await fetch('/api/auth/check', {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Cache-Control': 'no-cache'
-          },
-        })
-        
-        console.log('Response status:', response.status)  // Debug log
-        
-        if (!response.ok) {
-          const text = await response.text()  // Get the actual response text
-          console.log('Error response:', text)  // Debug log
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        
-        const data = await response.json()
-        console.log('Auth data:', data)  // Debug log
-        setIsLoggedIn(data.isAuthenticated)
-      } catch (error) {
-        console.error('Error checking auth status:', error)
-        setIsLoggedIn(false)
-      } finally {
-        setIsLoading(false)
-      }
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const checkAuth = async () => {
+    try {
+      const response = hasCookie('session');
+      setIsLoggedIn(response);
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      setIsLoggedIn(false);
+    } finally {
+      setIsLoading(false);
     }
-    
-    checkAuth()
-  }, [])
+  };
+
+  useEffect(() => {
+    setIsLoading(true);
+    checkAuth();
+    setIsLoading(false);
+
+    // Poll for changes every 5 seconds (optional)
+    const interval = setInterval(() => {
+        checkAuth();
+      }, 50);
   
-  return { isLoggedIn, isLoading }
+      return () => clearInterval(interval); // Cleanup interval on unmount
+
+  }, []);
+
+  return { isLoggedIn, setIsLoggedIn, isLoading };
 }

@@ -1,3 +1,4 @@
+import { sortByDateTime } from "@helper/sort";
 import { getData, postData } from "@utils/api/api";
 
 const url = process.env.NEXT_PUBLIC_DOWINN_API_URL;
@@ -24,7 +25,8 @@ export async function getAllLogsData() {
     const response = await getData(`${url}/test04/get_all_change_log`);
 
     if (response.data.length != 0) {
-      return response.data;
+      const sortedLogs = await sortByDateTime(response.data)
+      return sortedLogs;
     } else {
       return null;
     }

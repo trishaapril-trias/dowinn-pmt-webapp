@@ -1,12 +1,12 @@
 
 import HeaderTitle from "@components/HeaderTitle";
 import Link from "@node_modules/next/link";
-import PublicLayout from "./components/PublicLayout";
+
 
 
 export default async function Home() {
   return (
-    <PublicLayout>
+
       
       <div className="w-full flex-center flex-col">
       <HeaderTitle />
@@ -23,7 +23,7 @@ export default async function Home() {
         Sign In
       </Link>
     </div>
-    </PublicLayout>
+   
   );
 }
 

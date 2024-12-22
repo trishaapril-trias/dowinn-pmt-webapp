@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import HeaderTitle from "@components/HeaderTitle";
-import { checkLogin } from "@hooks/login";
+
 import { useRouter } from "@node_modules/next/navigation";
 import toast from "@node_modules/react-hot-toast/dist";
+import { checkLogin } from "@context/auth";
 
 
 const Login = () => {
@@ -61,7 +62,7 @@ const Login = () => {
     }
 
     const response = await checkLogin(formData);
-    console.log(response);
+    
     if (response === "ok") {
       router.push("/project");
       toast.success("Logged In Success");

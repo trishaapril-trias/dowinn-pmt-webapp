@@ -10,7 +10,6 @@ export async function addTasks(formData, projectID) {
       status: formData.status,
       contents: formData.contents,
     };
-    console.log("data req: ", data)
     const response = await postData(`${url}/test03/create_task`, data);
 
     if (response.data !== "No Project Found") {

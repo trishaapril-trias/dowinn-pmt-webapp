@@ -3,6 +3,7 @@ import '@styles/globals.css'
 import { Toaster } from '@node_modules/react-hot-toast/dist'
 
 
+
 export const metadata = {
     title: 'Project Management Tool',
     description: 'Monitor Tasks'

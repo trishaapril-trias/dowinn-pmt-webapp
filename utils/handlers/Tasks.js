@@ -19,7 +19,7 @@ const handleDragOver = (e) => {
     
   }
 
-const handleDrop = (e, newStatus, tasks, setTasks) => {
+const handleDrop = (e, newStatus, tasks, setTasks, getAllTasks, getAllLogs) => {
     e.preventDefault();
     const taskId = parseInt(e.dataTransfer.getData('taskId'));
     const taskName = e.dataTransfer.getData('taskName');
@@ -33,7 +33,8 @@ const handleDrop = (e, newStatus, tasks, setTasks) => {
           new: newStatus,
         }
         await handleLogs(data)
-        console.log(`Task "${task.name}" moved from ${task.status} to ${newStatus}`);
+        await getAllTasks()
+        await getAllLogs()
         return { ...task, status: newStatus };
       }
       return task;

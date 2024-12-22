@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import Link from "@node_modules/next/link";
 import LogsCards from "@components/cards/LogsCard";
@@ -17,7 +18,7 @@ import { IoCloseOutline, IoOpenOutline } from "react-icons/io5";
 
 const ProjectTask = () => {
   const params = useParams();
-  const { projectID } = params; // Extract 'id' from the URL
+  const { projectID } = params;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -25,9 +26,14 @@ const ProjectTask = () => {
   const [tasks, setTasks] = useState([]);
   const [logs, setLogs] = useState([]);
   const [showAll, setShowAll] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
 
   const toggleShowAll = () => {
     setShowAll((prev) => !prev);
+  };
+
+  const toggleLogs = () => {
+    setShowLogs((prev) => !prev);
   };
 
   const getAllTasks = async () => {
@@ -46,48 +52,50 @@ const ProjectTask = () => {
   }, []);
 
   return (
-    <div className="flex w-full gap-4 p-6 h-screen ">
+    <div className="flex flex-col lg:flex-row w-full gap-4 p-3 sm:p-4 md:p-6 h-screen overflow-y-auto">
       {/* Left section */}
       <div className="flex-grow">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-lg font-medium text-primary-orange">
-            PROJECT {projectID} - TASKS
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl orange_gradient text-center sm:text-left">
+            <b>PROJECT {projectID} - TASKS</b>
           </h1>
           <div className="flex gap-3">
             <Link
               href="/project"
-              className="outline_btn px-4 py-2 bg-gray-200 rounded text-sm"
+              className="outline_btn px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-200 rounded text-sm whitespace-nowrap"
             >
               Back
             </Link>
             <button
               type="button"
               onClick={openModal}
-              className="black_btn px-4 py-2 bg-gray-200 rounded text-sm"
+              className="px-4 sm:px-5 py-1.5 sm:py-2.5 bg-gray-200 rounded-full text-sm text-white bg-gradient-to-tr from-secondary-orange to-primary-orange whitespace-nowrap"
             >
               Add Task
             </button>
           </div>
         </div>
+
         <AddTask
           isOpen={isModalOpen}
           onClose={closeModal}
           projectID={projectID}
           getAllTasks={getAllTasks}
         />
-        {/* Columns container */}
-        <div className="flex gap-4">
+
+        {/* Columns container - Stack on mobile, row on larger screens */}
+        <div className="flex flex-col md:flex-row gap-4">
           {/* TODO Column */}
           <div
             className="flex-1 border border-gray-300 rounded-lg"
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, "Todo", tasks, setTasks, getAllTasks)}
+            onDrop={(e) => handleDrop(e, "Todo", tasks, setTasks, getAllTasks, getAllLogs)}
           >
-            <h2 className="font-medium border-b border-gray-300 bg-gray-200/50 text-black/80 rounded-t-lg  mb-4 p-4">
+            <h2 className="font-medium border-b border-gray-300 bg-gray-200/50 text-black/80 rounded-t-lg mb-4 p-3 sm:p-4">
               TODO
             </h2>
-            <div className="min-h-[200px]">
+            <div className="min-h-[150px] p-2">
               {tasks
                 .filter((task) => task.status === "Todo")
                 .map((task) => (
@@ -104,12 +112,12 @@ const ProjectTask = () => {
           <div
             className="flex-1 border border-gray-300 rounded-lg"
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, "In Progress", tasks, setTasks, getAllTasks)}
+            onDrop={(e) => handleDrop(e, "In Progress", tasks, setTasks, getAllTasks, getAllLogs)}
           >
-            <h2 className="font-medium border-b border-gray-300 bg-gray-200/50 text-black/80 rounded-t-lg  mb-4 p-4">
+            <h2 className="font-medium border-b border-gray-300 bg-gray-200/50 text-black/80 rounded-t-lg mb-4 p-3 sm:p-4">
               IN PROGRESS
             </h2>
-            <div className="min-h-[200px]">
+            <div className="min-h-[150px] p-2">
               {tasks
                 .filter((task) => task.status === "In Progress")
                 .map((task) => (
@@ -126,12 +134,12 @@ const ProjectTask = () => {
           <div
             className="flex-1 border border-gray-300 rounded-lg"
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, "Done", tasks, setTasks, getAllTasks)}
+            onDrop={(e) => handleDrop(e, "Done", tasks, setTasks, getAllTasks, getAllLogs)}
           >
-            <h2 className="font-medium border-b border-gray-300 bg-gray-200/50 text-black/80 rounded-t-lg  mb-4 p-4">
+            <h2 className="font-medium border-b border-gray-300 bg-gray-200/50 text-black/80 rounded-t-lg mb-4 p-3 sm:p-4">
               DONE
             </h2>
-            <div className="min-h-[200px]">
+            <div className="min-h-[150px] p-2">
               {tasks
                 .filter((task) => task.status === "Done")
                 .map((task) => (
@@ -147,36 +155,47 @@ const ProjectTask = () => {
       </div>
 
       {/* Right section - Logs */}
-      <div className="w-64 h-fit border border-gray-300 rounded-lg">
-      <h2 className="font-medium p-4 border-b border-gray-300 bg-black/80 text-white rounded-t-lg">
-        Logs
-      </h2>
-      <div
-        className={`grid grid-cols-1 mt-0 overflow-y-auto transition-all duration-300 ${
-          showAll ? "max-h-[500px]" : "max-h-[300px]"
-        }`}
-      >
-        {logs.map((log, index) => (
-          <LogsCards key={index} log={log} />
-        ))}
+      {/* Mobile: Toggle button for logs */}
+      <div className="lg:hidden w-full flex justify-center mb-4">
+        <button
+          onClick={toggleLogs}
+          className="px-4 py-2 bg-gray-200 rounded-full text-sm"
+        >
+          {showLogs ? 'Hide Logs' : 'Show Logs'}
+        </button>
       </div>
-      <div
-        className="flex justify-center items-center gap-3 bg-gray-200/60 rounded-b-lg cursor-pointer p-3 text-black/80 font-semibold"
-        onClick={toggleShowAll}
-      >
-        {showAll ? (
-          <>
-            <IoCloseOutline />
-            <p>See Less</p>
-          </>
-        ) : (
-          <>
-            <IoOpenOutline />
-            <p>See More</p>
-          </>
-        )}
+
+      {/* Logs section - Hidden by default on mobile, shown with toggle */}
+      <div className={`w-full lg:w-64 h-fit border border-gray-300 rounded-lg ${!showLogs && 'hidden lg:block'}`}>
+        <h2 className="font-medium p-3 sm:p-4 border-b border-gray-300 bg-gradient-to-tr from-secondary-orange to-primary-orange text-white rounded-t-lg">
+          Logs
+        </h2>
+        <div
+          className={`grid grid-cols-1 mt-0 overflow-y-auto transition-all duration-300 ${
+            showAll ? "max-h-[500px]" : "max-h-[300px]"
+          }`}
+        >
+          {logs.map((log, index) => (
+            <LogsCards key={index} log={log} />
+          ))}
+        </div>
+        <div
+          className="flex justify-center items-center gap-3 bg-gray-200/60 rounded-b-lg cursor-pointer p-3 text-black/80 font-semibold"
+          onClick={toggleShowAll}
+        >
+          {showAll ? (
+            <>
+              <IoCloseOutline />
+              <p>See Less</p>
+            </>
+          ) : (
+            <>
+              <IoOpenOutline />
+              <p>See More</p>
+            </>
+          )}
+        </div>
       </div>
-    </div>
     </div>
   );
 };

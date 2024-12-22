@@ -7,7 +7,7 @@ import React, { useState } from "react";
 const AddProject = ({ isOpen, onClose , getAllProjects}) => {
   if (!isOpen) return null;
   const user = getCookie('user_id');
-  console.log("user: ", user)
+  
   const [formData, setFormData] = useState({
     userid: user,
     name: "",
