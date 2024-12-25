@@ -1,21 +1,17 @@
-// components/Modal.js
-import { addProject } from "@hooks/project";
 import { getCookie } from "cookies-next/client";
-import toast from "@node_modules/react-hot-toast/dist";
 import React, { useState } from "react";
+import { handleAddProject, handleEditProject } from "@utils/handlers/Projects";
 
-const AddProject = ({ isOpen, onClose , getAllProjects}) => {
+const ProjectModal = ({ isOpen, onClose, getAllProjects, editData, setEditData }) => {
   if (!isOpen) return null;
-  const user = getCookie('user_id');
-  
+  const user = getCookie("user_id");
+
   const [formData, setFormData] = useState({
     userid: user,
-    name: "",
-    description: "",
+    name: editData.name ? editData.name : "",
+    description: editData.description ? editData.description : "",
   });
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginError, setLoginError] = useState("");
 
   const validateForm = () => {
     const newErrors = {};
@@ -59,31 +55,35 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoginError("");
 
     if (!validateForm()) {
       return;
     }
 
-    const response = await addProject(formData);
-    if(response != null){
-      onClose()
-      toast.success("Project Added Successfully")
-      getAllProjects();
-    }else{
-      toast.error("No Member Found")
+   await handleAddProject(formData)
+   onClose();
+   getAllProjects();
+  };
+
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
     }
 
-    setIsSubmitting(false);
+    await handleEditProject(formData, editData.id)
+    onClose();
+    getAllProjects();
+    setEditData("")
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="orange_gradient text-xl font-semibold mb-4">
-          <b>Add Project</b>
+          <b>{editData ? "Edit" : "Add"} Project</b>
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={editData ? handleSubmitEdit : handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label
               htmlFor="userid"
@@ -92,7 +92,6 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
               User ID
             </label>
             <input
-            
               id="userid"
               name="userid"
               type="text"
@@ -123,7 +122,6 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
-              disabled={isSubmitting}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.name ? "border-red-500" : "border-gray-300"
               }`}
@@ -146,7 +144,6 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
               type="text"
               value={formData.description}
               onChange={handleChange}
-              disabled={isSubmitting}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.description ? "border-red-500" : "border-gray-300"
               }`}
@@ -159,14 +156,13 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
             className=" w-full px-4 py-2 text-white bg-[#F3940B] rounded-lg hover:bg-[#EE750B] focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Adding..." : "Add"}
+            {editData ? "Save" : "Add"}
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => {onClose(); setEditData("")}}
             className=" w-full px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-slate-400 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
@@ -177,4 +173,4 @@ const AddProject = ({ isOpen, onClose , getAllProjects}) => {
   );
 };
 
-export default AddProject;
+export default ProjectModal;

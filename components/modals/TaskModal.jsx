@@ -1,20 +1,27 @@
-// components/Modal.js
-import { addTasks } from "@hooks/tasks";
-import { useParams } from "@node_modules/next/navigation";
-import toast from "@node_modules/react-hot-toast/dist";
+
+import {
+  handleAddTask,
+  handleEditTask,
+} from "@utils/handlers/Tasks";
 import React, { useState } from "react";
 
-const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
+const TaskModal = ({
+  isOpen,
+  onClose,
+  projectID,
+  getAllTasks,
+  getAllLogs,
+  editData,
+  setEditData,
+}) => {
   if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
-    name: "",
-    status: "",
-    contents: "",
+    name: editData ? editData.name : "",
+    status: editData ? editData.status : "",
+    contents: editData ? editData.contents : "",
   });
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginError, setLoginError] = useState("");
 
   const validateForm = () => {
     const newErrors = {};
@@ -56,34 +63,42 @@ const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoginError("");
 
     if (!validateForm()) {
       return;
     }
 
-    const response = await addTasks(formData, projectID);
-    if (response != null) {
-      onClose();
-      getAllTasks();
-      toast.success("Task Added Successfully");
-    } else {
-      toast.error("No Project Found");
+    await handleAddTask(projectID, formData);
+    getAllTasks();
+    getAllLogs();
+    onClose();
+  };
+
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
     }
 
-    setIsSubmitting(false);
+    await handleEditTask(editData, formData);
+    getAllTasks();
+    getAllLogs();
+    setEditData("");
+    onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="orange_gradient text-xl font-semibold mb-4">
-          <b>Add Task</b>
+          <b> {editData ? "Edit" : "Add"} Task</b>
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={editData ? handleSubmitEdit : handleSubmit}
+          className="space-y-4"
+        >
           <div className="space-y-2">
             <label
               htmlFor="name"
@@ -98,7 +113,6 @@ const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
-              disabled={isSubmitting}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.name ? "border-red-500" : "border-gray-300"
               }`}
@@ -120,7 +134,6 @@ const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              disabled={isSubmitting}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.status ? "border-red-500" : "border-gray-300"
               }`}
@@ -149,7 +162,6 @@ const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
               name="contents"
               value={formData.contents}
               onChange={handleChange}
-              disabled={isSubmitting}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.contents ? "border-red-500" : "border-gray-300"
               }`}
@@ -162,14 +174,16 @@ const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
             className=" w-full px-4 py-2 text-white bg-[#F3940B] rounded-lg hover:bg-[#EE750B] focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Adding..." : "Add"}
+            {editData ? "Save" : "Add"}
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              setEditData("");
+            }}
             className=" w-full px-4 py-2 text-white bg-black/80 rounded-lg hover:bg-black/40 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
@@ -180,4 +194,4 @@ const AddTask = ({ isOpen, onClose, projectID, getAllTasks }) => {
   );
 };
 
-export default AddTask;
+export default TaskModal;

@@ -1,15 +1,9 @@
-import { getData, postData } from "@utils/api/api";
+import { getData, patchData, postData } from "@utils/api/api";
 
 const url = process.env.NEXT_PUBLIC_DOWINN_API_URL;
 
-export async function addTasks(formData, projectID) {
+export async function addTasks(data) {
   try {
-    const data = {
-      project_id: parseInt(projectID),
-      name: formData.name,
-      status: formData.status,
-      contents: formData.contents,
-    };
     const response = await postData(`${url}/test03/create_task`, data);
 
     if (response.data !== "No Project Found") {
@@ -32,6 +26,20 @@ export async function getAllTasksData(id) {
       );
 
       return filteredTasks;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+export async function editTasks(data) {
+  try {
+    const response = await patchData(`${url}/test03/patch_task`, data);
+
+    if (response) {
+      return response.data;
     } else {
       return null;
     }

@@ -2,20 +2,13 @@
 
 
 import ProjectCard from "@components/cards/ProjectCard";
-import AddProject from "@components/modals/AddProject";
-import EditProject from "@components/modals/EditProject";
+import ProjectModal from "@components/modals/ProjectModal";
 import { getAllProjectData } from "@hooks/project";
 import React, { useEffect, useState } from "react";
 
 const Project = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Add Project Modal
-  const openEditModal = () => setIsEditModalOpen(true);
-  const closeEditModal = () => setIsEditModalOpen(false);
-
-  // Edit Project Modal
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
@@ -26,6 +19,11 @@ const Project = () => {
     const response = await getAllProjectData();
     setProjectData(response);
   };
+
+  const handleEditProject = (project) => {
+    setEditData(project);
+    setIsModalOpen(true);
+  }
 
   useEffect(() => {
     getAllProjects();
@@ -52,10 +50,12 @@ const Project = () => {
         </div>
       </div>
 
-      <AddProject 
+      <ProjectModal 
         isOpen={isModalOpen} 
         onClose={closeModal} 
         getAllProjects={getAllProjects}
+        editData={editData}
+        setEditData={setEditData}
       />
 
       {/* Responsive grid layout */}
@@ -64,20 +64,11 @@ const Project = () => {
           <ProjectCard
             key={index}
             proj={proj}
-            openEditModal={openEditModal}
-            closeEditModal={closeEditModal}
-            isEditModalOpen={isEditModalOpen}
-            setEditData={setEditData}
+            handleEditProject={handleEditProject}
           />
         ))}
       </div>
 
-      <EditProject 
-        isOpen={isEditModalOpen} 
-        onClose={closeEditModal} 
-        editData={editData} 
-        getAllProjects={getAllProjects}
-      />
     </div>
   );
 };

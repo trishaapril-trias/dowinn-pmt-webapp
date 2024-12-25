@@ -35,7 +35,7 @@ export async function login(formdata) {
     user_id: formdata.user_id,
   };
 
-  const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const expires = new Date(Date.now() + 10 * 60 * 4000); // 40 minutes
 
   // Encrypt data
   const session = await encryptData(data, expires);

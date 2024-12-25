@@ -17,7 +17,6 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginError, setLoginError] = useState("");
 
   const validateForm = () => {
     const newErrors = {};
@@ -55,8 +54,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoginError("");
 
+    setIsSubmitting(true);
+    
     if (!validateForm()) {
       return;
     }
@@ -132,12 +132,6 @@ const Login = () => {
                   <p className="text-sm text-red-500">{errors.password}</p>
                 )}
               </div>
-
-              {/* {loginError && (
-            <div className="p-3 text-sm text-red-500 bg-red-100 border border-red-400 rounded">
-              {loginError}
-            </div>
-          )} */}
 
               <button
                 type="submit"

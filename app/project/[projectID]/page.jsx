@@ -4,8 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "@node_modules/next/link";
 import LogsCards from "@components/cards/LogsCard";
 import TaskCard from "@components/cards/TaskCard";
-import AddTask from "@components/modals/AddTasks";
-import { logsData } from "@constants/staticData";
+
 import {
   handleDragOver,
   handleDragStart,
@@ -15,10 +14,13 @@ import { useParams } from "@node_modules/next/navigation";
 import { getAllTasksData } from "@hooks/tasks";
 import { getAllLogsData } from "@hooks/logs";
 import { IoCloseOutline, IoOpenOutline } from "react-icons/io5";
+import TaskModal from "@components/modals/TaskModal";
 
 const ProjectTask = () => {
   const params = useParams();
   const { projectID } = params;
+
+  // ADD TASK MODAL
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -27,6 +29,7 @@ const ProjectTask = () => {
   const [logs, setLogs] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
+  const [editData, setEditData] = useState("");
 
   const toggleShowAll = () => {
     setShowAll((prev) => !prev);
@@ -46,6 +49,11 @@ const ProjectTask = () => {
     setLogs(response);
   };
 
+  const handleEditTask = (task) => {
+    setEditData(task);
+    setIsModalOpen(true);
+  }
+
   useEffect(() => {
     getAllTasks();
     getAllLogs();
@@ -56,7 +64,7 @@ const ProjectTask = () => {
       {/* Left section */}
       <div className="flex-grow">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-center  sm:mb-6 gap-3">
           <h1 className="text-2xl sm:text-3xl md:text-4xl orange_gradient text-center sm:text-left">
             <b>PROJECT {projectID} - TASKS</b>
           </h1>
@@ -77,11 +85,14 @@ const ProjectTask = () => {
           </div>
         </div>
 
-        <AddTask
+        <TaskModal
           isOpen={isModalOpen}
           onClose={closeModal}
           projectID={projectID}
           getAllTasks={getAllTasks}
+          getAllLogs={getAllLogs}
+          editData={editData}
+          setEditData={setEditData}
         />
 
         {/* Columns container - Stack on mobile, row on larger screens */}
@@ -103,6 +114,7 @@ const ProjectTask = () => {
                     key={`${task.project_id}-${task.name}`}
                     task={task}
                     onDragStart={handleDragStart}
+                    handleEditTask={handleEditTask}
                   />
                 ))}
             </div>
@@ -125,6 +137,7 @@ const ProjectTask = () => {
                     key={`${task.project_id}-${task.name}`}
                     task={task}
                     onDragStart={handleDragStart}
+                    handleEditTask={handleEditTask}
                   />
                 ))}
             </div>
@@ -147,6 +160,7 @@ const ProjectTask = () => {
                     key={`${task.project_id}-${task.name}`}
                     task={task}
                     onDragStart={handleDragStart}
+                    handleEditTask={handleEditTask}
                   />
                 ))}
             </div>
@@ -156,10 +170,10 @@ const ProjectTask = () => {
 
       {/* Right section - Logs */}
       {/* Mobile: Toggle button for logs */}
-      <div className="lg:hidden w-full flex justify-center mb-4">
+      <div className="lg:hidden w-full flex justify-center ">
         <button
           onClick={toggleLogs}
-          className="px-4 py-2 bg-gray-200 rounded-full text-sm"
+          className="px-4 py-2 text-white bg-gradient-to-t from-primary-orange to-secondary-orange rounded-full text-sm"
         >
           {showLogs ? 'Hide Logs' : 'Show Logs'}
         </button>

@@ -26,7 +26,7 @@ export function useAuth() {
     // Poll for changes every 5 seconds (optional)
     const interval = setInterval(() => {
         checkAuth();
-      }, 50);
+      }, 1000);
   
       return () => clearInterval(interval); // Cleanup interval on unmount
 

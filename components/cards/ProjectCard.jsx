@@ -4,10 +4,9 @@ import Link from "@node_modules/next/link";
 import React from "react";
 import { FaEdit } from "react-icons/fa";
 import { BsFillArrowRightSquareFill } from "react-icons/bs";
-import EditProject from "@components/modals/EditProject";
 
 
-const ProjectCard = ({ proj, openEditModal, setEditData}) => {
+const ProjectCard = ({ proj, handleEditProject}) => {
   
   return (
     <>
@@ -16,7 +15,7 @@ const ProjectCard = ({ proj, openEditModal, setEditData}) => {
         <p className="text-sm text-gray-500">{proj.description}</p>
         <div className=" flex justify-between items-center">
           <div>
-            <button type="button" onClick={() => {openEditModal(); setEditData(proj)}}>
+            <button type="button" onClick={() => handleEditProject(proj)} >
               <FaEdit className=" text-secondary-orange" />
             </button>
           </div>
