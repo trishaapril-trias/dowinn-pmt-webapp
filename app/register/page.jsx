@@ -6,80 +6,87 @@ import { addMember } from "@hooks/member";
 import toast from "@node_modules/react-hot-toast/dist";
 import { useRouter } from "@node_modules/next/navigation";
 
-
-
 const Register = () => {
   const router = useRouter();
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        password: "",
-      });
-      const [errors, setErrors] = useState({});
-      const [isSubmitting, setIsSubmitting] = useState(false);
-      const [loginError, setLoginError] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
-    const validateForm = () => {
-        const newErrors = {};
-    
-        if (!formData.username) {
-          newErrors.username = "Username is required";
-        } else if (formData.username.length < 3) {
-          newErrors.username = "Username must be at least 3 characters";
-        }
+  const validateForm = () => {
+    const newErrors = {};
 
-        if (!formData.email) {
-            newErrors.email = "Email is required";
-          } else if (formData.email.length < 3) {
-            newErrors.email = "Email must be at least 3 characters";
-          }
-    
-        if (!formData.password) {
-          newErrors.password = "Password is required";
-        } else if (formData.password.length < 3) {
-          newErrors.password = "Password must be at least 3 characters";
-        }
-    
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-      };
-    
-      const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
-        // Clear error when user starts typing
-        if (errors[name]) {
-          setErrors((prev) => ({
-            ...prev,
-            [name]: "",
-          }));
-        }
-      };
-    
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoginError("");
-    
-        if (!validateForm()) {
-          return;
-        }
+    if (!formData.username) {
+      newErrors.username = "Username is required";
+    } else if (formData.username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters";
+    }
 
-        const response = await addMember(formData)
-        console.log(response)
-        if(response !== "Member Already Exist"){
-          router.push('/login')
-          toast.success("Registered Succefully")
-        }else{
-          toast.error(response)
-        }
-    
-        setIsSubmitting(false);
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (formData.email.length < 3) {
+      newErrors.email = "Email must be at least 3 characters";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
 
-      };
-    
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 3) {
+      newErrors.password = "Password must be at least 3 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+};
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const data = {
+      user_id: formData.username,
+      email: formData.email,
+      password: formData.password,
+    };
+
+    const response = await addMember(data);
+
+
+    if(response !== "Member Already Exist"){
+      router.push('/login')
+      toast.success("Registered Succefully")
+    }else{
+      toast.error(response)
+    }
+
+    setIsSubmitting(false);
+  };
+
   return (
     <div className="w-full flex-center flex-col">
       <HeaderTitle />
