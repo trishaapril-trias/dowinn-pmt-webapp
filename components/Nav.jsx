@@ -5,7 +5,7 @@ import Image from "next/image";
 import { logout } from "@context/auth";
 import { useRouter } from "@node_modules/next/navigation";
 import { useAuth } from "@hooks/useAuth";
-import { useEffect } from "react";
+import Logo from "../public/assets/images/logo_pmt.png"
 
 const Nav = () => {
   const { isLoggedIn, setIsLoggedIn } = useAuth();
@@ -26,7 +26,7 @@ const Nav = () => {
     <nav className="flex-between w-full mb-16 pt-3">
       <Link href="/login" className="flex gap-2 flex-center py-5">
         <Image
-          src="/assets/images/logo_pmt.png"
+          src={Logo}
           alt="PMT Logo"
           width={40}
           height={40}
