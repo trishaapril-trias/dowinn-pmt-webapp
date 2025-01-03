@@ -3,6 +3,7 @@ import { cookies } from "@node_modules/next/headers";
 import { decryptData, encryptData } from "@utils/dataEncryption/dataEncryption";
 import { postData } from "@utils/api/api";
 import { useAuth } from "@hooks/useAuth";
+import { getAllMember } from "@hooks/member";
 
 const url = process.env.NEXT_PUBLIC_DOWINN_API_URL;
 
@@ -17,16 +18,30 @@ export async function checkLogin(formData) {
     const response = await postData(`${url}/testlogin`, data);
 
     if (response.data === "ok") {
-      setCookie('user_id', data.user_id);
-      await login(data.user_id);
-      
-      
-      return response.data;
+      const user = await getUserInfo(data.user_id);
+      if (user != null) {
+        setCookie("id", user?.id);
+        setCookie("user_id", data.user_id);
+        await login(data.user_id);
+        return response.data;
+      } else {
+        return null
+      }
     } else {
       return null;
     }
   } catch (error) {
     console.error(error.message);
+  }
+}
+
+async function getUserInfo(user_id) {
+  const response = await getAllMember();
+  if (response != null) {
+    const filterUser = response.find((user) => user.user_id === user_id);
+    return filterUser;
+  } else {
+    return null;
   }
 }
 
@@ -50,9 +65,9 @@ export async function login(formdata) {
 }
 
 export async function logout() {
-  const expires = new Date(0)
-  setCookie("session", "", { expires, path: "/" })
-  deleteCookie("user_id")
+  const expires = new Date(0);
+  setCookie("session", "", { expires, path: "/" });
+  deleteCookie("user_id");
 }
 
 export async function getSession() {
@@ -60,4 +75,3 @@ export async function getSession() {
   if (!session) return null;
   return await decryptData(session);
 }
-

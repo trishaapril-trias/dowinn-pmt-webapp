@@ -1,6 +1,6 @@
 import { tasksData } from "@constants/staticData";
 import { addLogs } from "@hooks/logs";
-import { addTasks, editTasks } from "@hooks/tasks";
+import { addTasks, editTasks, getAllTasksData } from "@hooks/tasks";
 import toast from "@node_modules/react-hot-toast/dist";
 
 
@@ -100,6 +100,21 @@ const handleEditTask = async (editData, formData) => {
 
 }
 
+const getTaskCount = async (id) => {
+  const tasks = await getAllTasksData(id);
+  
+  const todoCount = tasks.filter((todo) => todo.status === "Todo");
+  const inprogressCount = tasks.filter((inprog) => inprog.status === "In Progress");
+  const done = tasks.filter((done) => done.status === "Done");
+
+  const tasksCount = {
+    todo: todoCount.length,
+    inprogress: inprogressCount.length,
+    done: done.length
+  }
+  return tasksCount
+}
 
 
-export { handleDragStart, handleDragOver, handleDrop, handleLogs, handleAddTask, handleEditTask };
+
+export { handleDragStart, handleDragOver, handleDrop, handleLogs, handleAddTask, handleEditTask, getTaskCount };
